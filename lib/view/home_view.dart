@@ -1,132 +1,109 @@
 import 'package:flutter/material.dart';
-import 'package:keywordly_app/controller/cloud_functions_controller.dart';
-import 'package:keywordly_app/model/theme_model.dart';
 import 'package:provider/provider.dart';
+import 'package:the_voice/provider/setting_provider.dart';
+import 'package:the_voice/view/search_view.dart';
 
-class HomeView extends StatefulWidget {
-  HomeView({super.key});
-
-  @override
-  State<HomeView> createState() => _HomeViewState();
-}
-
-class _HomeViewState extends State<HomeView> {
-  CloudFunctionsController cloudFunctionsController =
-      CloudFunctionsController();
-
-  String input = '';
-  int words = 0;
-  int characters = 0;
-  dynamic output = '';
+class HomeView extends StatelessWidget {
+  const HomeView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+    ColorScheme cs = Theme.of(context).colorScheme;
+    TextTheme tt = Theme.of(context).textTheme;
+    SettingProvider sm = context.watch<SettingProvider>();
+    bool lang = sm.language == Language.english;
 
-    return Consumer<ThemeModel>(
-      builder: (context, value, child) => Scaffold(
-        backgroundColor: Color.lerp(
-          colorScheme.primary,
-          colorScheme.background,
-          0.99,
+    return Column(
+      children: [
+        const Expanded(flex: 1, child: SizedBox()),
+        Text(
+          lang ? 'Correctly' : 'Correctly',
+          style: tt.headlineLarge?.copyWith(color: cs.onSurface),
         ),
-        appBar: AppBar(
-          centerTitle: true,
-          title: Text('Keywordly'),
-          actions: [
-            IconButton(
-              onPressed: () => value.changeBrightness(),
-              icon: Icon(
-                value.brightness == Brightness.light
-                    ? Icons.wb_sunny_outlined
-                    : Icons.wb_sunny_rounded,
-              ),
-            ),
-          ],
-        ),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            SizedBox(height: 32),
-            Expanded(
+        const SizedBox(height: 32),
+        const BuildSearch(),
+        const Expanded(flex: 4, child: SizedBox()),
+      ],
+    );
+  }
+}
+
+class BuildSearch extends StatefulWidget {
+  const BuildSearch({super.key});
+
+  @override
+  State<BuildSearch> createState() => _BuildSearchState();
+}
+
+class _BuildSearchState extends State<BuildSearch> {
+  String text = '';
+
+  @override
+  Widget build(BuildContext context) {
+    ColorScheme cs = Theme.of(context).colorScheme;
+    TextTheme tt = Theme.of(context).textTheme;
+    SettingProvider sm = context.watch<SettingProvider>();
+    bool largeFont = sm.largeFont;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: SizedBox(
+        width: double.infinity,
+        height: 56,
+        child: Material(
+          elevation: 3,
+          color: cs.surface,
+          shadowColor: Colors.transparent,
+          surfaceTintColor: cs.surfaceTint,
+          borderRadius: BorderRadius.circular(28),
+          child: InkWell(
+            onTap: () {},
+            borderRadius: BorderRadius.circular(28),
+            highlightColor: Colors.transparent,
+            splashFactory: InkRipple.splashFactory,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  SizedBox(width: 32),
+                  const Icon(Icons.menu),
                   Expanded(
-                    child: Card(
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        side: BorderSide(
-                          color: colorScheme.outline,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: TextField(
+                        onChanged: (value) => text = value,
+                        cursorColor: cs.primary,
+                        style: tt.bodyLarge,
+                        textAlignVertical: TextAlignVertical.center,
+                        decoration: InputDecoration(
+                          isCollapsed: true,
+                          border: InputBorder.none,
+                          hintText: sm.language == Language.english
+                              ? 'type sentence'
+                              : '문장을 입력하세요',
+                          hintStyle: largeFont
+                              ? tt.titleLarge?.copyWith(
+                                  color: cs.onSurfaceVariant,
+                                )
+                              : tt.bodyLarge?.copyWith(
+                                  color: cs.onSurfaceVariant,
+                                ),
                         ),
-                        borderRadius: BorderRadius.all(Radius.circular(12)),
-                      ),
-                      child: Center(
-                        child: Text(output),
                       ),
                     ),
                   ),
-                  SizedBox(width: 32),
+                  IconButton(
+                    icon: const Icon(Icons.search),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SearchView(text: text),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
-            SizedBox(height: 32),
-            Row(
-              children: [
-                SizedBox(width: 32),
-                Expanded(
-                  child: TextField(
-                    onChanged: (value) => setState(
-                      () {
-                        input = value;
-                        words = input
-                            .split(' ')
-                            .where((element) => element.isNotEmpty)
-                            .length;
-                        characters = input.replaceAll(' ', '').length;
-                      },
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'Input Keyword',
-                      counterText: '$words words $characters characters',
-                      border: OutlineInputBorder(),
-                      suffixIcon: IconButton(
-                        onPressed: () async {
-                          output =
-                              await cloudFunctionsController.getResponse(input);
-                          setState(() {});
-                        },
-                        icon: Icon(Icons.send),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(width: 32),
-              ],
-            ),
-            SizedBox(height: 32),
-          ],
-        ),
-        bottomNavigationBar: NavigationBar(
-          selectedIndex: 1,
-          destinations: [
-            NavigationDestination(
-              selectedIcon: Icon(Icons.analytics),
-              icon: Icon(Icons.analytics_outlined),
-              label: 'Analysis',
-            ),
-            NavigationDestination(
-              selectedIcon: Icon(Icons.home),
-              icon: Icon(Icons.home_outlined),
-              label: 'Home',
-            ),
-            NavigationDestination(
-              selectedIcon: Icon(Icons.person),
-              icon: Icon(Icons.person_outline),
-              label: 'Profile',
-            ),
-          ],
+          ),
         ),
       ),
     );

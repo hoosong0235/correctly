@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "keywordly_app" "\0"
+            VALUE "FileDescription", "correctly" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "keywordly_app" "\0"
+            VALUE "InternalName", "correctly" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "keywordly_app.exe" "\0"
-            VALUE "ProductName", "keywordly_app" "\0"
+            VALUE "OriginalFilename", "correctly.exe" "\0"
+            VALUE "ProductName", "correctly" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

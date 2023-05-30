@@ -1,4 +1,4 @@
-package com.example.keywordly_app
+package com.example.correctly
 
 import io.flutter.embedding.android.FlutterActivity
 
