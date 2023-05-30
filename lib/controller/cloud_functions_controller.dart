@@ -9,6 +9,7 @@ class CloudFunctionsController {
   static Future<dynamic> getResponse(String input) async {
     http.Response response = await http.post(
       Uri.https(authority, encodedPath),
+      headers: {"Content-Type": "application/json"},
       body: jsonEncode({'input': input}),
     );
 
